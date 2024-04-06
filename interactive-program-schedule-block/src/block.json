@@ -1,0 +1,20 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "create-block/interactive-program-schedule-block",
+	"version": "1.0.0",
+	"title": "Interactive Program Schedule Block",
+	"category": "widgets",
+	"icon": "calendar",
+	"description": "Interactive scheduler calendar block.",
+	"example": {},
+	"supports": {
+		"html": false
+	},
+	"textdomain": "interactive-program-schedule-block",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"render": "file:./render.php",
+	"viewScript": "file:./view.js"
+}

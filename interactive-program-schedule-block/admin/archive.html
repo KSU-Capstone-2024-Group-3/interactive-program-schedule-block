@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <h1>Archive</h1>
+
+    <table id="archivetable">
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>One Time</th>
+            <th>Same Time</th>
+            <th>Every-x-Weeks</th>
+            <th>Schedule</th>
+            <th>Continue Airing</th>
+        </tr>
+    </table>
+
+</body>
+
+</html>
+
+<script>
+    
+    function loadElementToTable(element) {
+        // Get the table
+        table = document.getElementById('archivetable');
+
+        // Create a new row at bottom of table
+        newRow = table.insertRow(-1);
+
+        // Insert a cell in the row at index 0
+        newCell = newRow.insertCell(0);
+        newCell.innerHTML = element["id"];
+
+        // Insert a cell in the row at index 1
+        newCell = newRow.insertCell(1);
+        newCell.innerHTML = element["name"];
+
+        // Insert a cell in the row at index 2
+        newCell = newRow.insertCell(2);
+        newCell.innerHTML = element["description"];
+
+        // Insert a cell in the row at index 3
+        newCell = newRow.insertCell(3);
+        newCell.innerHTML = element["start_date"];
+
+        // Insert a cell in the row at index 4
+        newCell = newRow.insertCell(4);
+        newCell.innerHTML = element["end_date"];
+
+        // Insert a cell in the row at index 5
+        newCell = newRow.insertCell(5);
+        newCell.innerHTML = element["one_time"];
+
+        // Insert a cell in the row at index 6
+        newCell = newRow.insertCell(6);
+        newCell.innerHTML = element["same_time"];
+
+        // Insert a cell in the row at index 7
+        newCell = newRow.insertCell(7);
+        newCell.innerHTML = element["every_x_weeks"];
+
+        // Insert a cell in the row at index 9
+        newCell = newRow.insertCell(8);
+        newCell.innerHTML = 'TODO';
+
+        newCell = newRow.insertCell(9);
+        newCell.innerHTML = "<form method='post' class='una-form'> <button name='id' value='" + element["id"]  + "' upvote''>Unarchive</button> </form>";
+    }
+    
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if(result_data) {
+            result_data.forEach(element => {
+                loadElementToTable(element);
+            });
+        }
+    });
+
+    //add sorting capability?
+
+</script>
+
+<style>
+    .una-form>button {
+        display: block;
+        margin: auto;
+    }
+
+    #archivetable {
+        width: 90%;
+        border-collapse: collapse;
+    }
+
+    tr td {
+        border: 1px solid black;
+    }
+
+    td {
+        padding: 1px 5px;
+    }
+
+</style>
