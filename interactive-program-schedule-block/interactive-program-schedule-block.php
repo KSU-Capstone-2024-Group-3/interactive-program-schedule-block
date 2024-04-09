@@ -36,5 +36,6 @@ add_action( 'admin_menu', 'register_admin_page');
 
 //include 'database-init.php';
 
-include 'database-init.php';
-register_activation_hook(__FILE__, 'init_schedule_database');
+include 'database.php';
+register_activation_hook(__FILE__, 'init_schedule_database'); 	//for init our database on plugin activation
+register_uninstall_hook(__FILE__, 'drop_schedule_database');	//for drop our database on plugin uninstall

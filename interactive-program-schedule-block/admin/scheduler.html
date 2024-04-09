@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <h1>Airing</h1>
+    <hr>
+    <div class="table-container">
+    <table id="airingtable">
+        <tr>
+            <th>Id</th>
+            <th>Show Name</th>
+            <th>Description</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>One Time</th>
+            <th>Same Time</th>
+            <th>Every-x-Weeks</th>
+            <th>Schedule</th>
+            <th>Stop Airing</th>
+        </tr>
+    </table>
+    </div>
+    <h1>Admin logs</h1>
+    <hr>
+    <div class="table-container">
+        <table id="logtable">
+            <tr>
+                <th>Id</th>
+                <th>User</th>
+                <th>Show Name</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>
+
+<script>
+    
+    function loadElementToAiring(element) {
+        // Get the table
+        table = document.getElementById('airingtable');
+
+        // Create a new row at bottom of table
+        newRow = table.insertRow(-1);
+
+        // Insert a cell in the row at index 0
+        newCell = newRow.insertCell(0);
+        newCell.innerHTML = element["id"];
+
+        // Insert a cell in the row at index 1
+        newCell = newRow.insertCell(1);
+        newCell.innerHTML = element["name"];
+
+        // Insert a cell in the row at index 2
+        newCell = newRow.insertCell(2);
+        newCell.innerHTML = element["description"];
+
+        // Insert a cell in the row at index 3
+        newCell = newRow.insertCell(3);
+        newCell.innerHTML = element["start_date"];
+
+        // Insert a cell in the row at index 4
+        newCell = newRow.insertCell(4);
+        newCell.innerHTML = element["end_date"];
+        if(element["end_date"] != null) { //if there is an end date
+			let endDate = new Date(element["end_date"]);
+			if(new Date() > endDate) { //if start time is greater than end date
+                newRow.style.color = "red";
+			}
+		}
+
+        // Insert a cell in the row at index 5
+        newCell = newRow.insertCell(5);
+        newCell.innerHTML = element["one_time"];
+
+        // Insert a cell in the row at index 6
+        newCell = newRow.insertCell(6);
+        newCell.innerHTML = element["same_time"];
+
+        // Insert a cell in the row at index 7
+        newCell = newRow.insertCell(7);
+        newCell.innerHTML = element["every_x_weeks"];
+
+        // Insert a cell in the row at index 9
+        newCell = newRow.insertCell(8);
+        newCell.innerHTML = 'TODO';
+
+        newCell = newRow.insertCell(9);
+        newCell.innerHTML = "<form method='post' class='a-form'> <button name='archive' value='" + element["id"]  + "'>Archive</button> <input type='hidden' name='show-name' value='"+ element["name"] +"'> </form>";
+    }
+    
+    function loadElementToLog(element) {
+        // Get the table
+        table = document.getElementById('logtable');
+
+        // Create a new row at bottom of table
+        newRow = table.insertRow(-1);
+
+        // Insert a cell in the row at index 0
+        newCell = newRow.insertCell(0);
+        newCell.innerHTML = element["id"];
+
+        // Insert a cell in the row at index 1
+        newCell = newRow.insertCell(1);
+        newCell.innerHTML = element["user"];
+
+        // Insert a cell in the row at index 2
+        newCell = newRow.insertCell(2);
+        newCell.innerHTML = element["show_name"];
+
+        // Insert a cell in the row at index 3
+        newCell = newRow.insertCell(3);
+        newCell.innerHTML = element["date"];
+
+        // Insert a cell in the row at index 3
+        newCell = newRow.insertCell(4);
+        newCell.innerHTML = element["action"];
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if(result_data) {
+            result_data.forEach(element => {
+                loadElementToAiring(element);
+            });
+        }
+
+        if(log_data) {
+            log_data = log_data.reverse();
+            log_data.forEach(element => {
+                loadElementToLog(element);
+            });
+        }
+    });
+
+    //add sorting capability?
+
+</script>
+
+<style>
+    .a-form>button {
+        display: block;
+        margin: auto;
+    }
+
+    #airingtable, #logtable {
+        width: 90%;
+        border-collapse: collapse;
+    }
+
+    .table-container {
+        max-height: 20rem;
+        overflow-y: auto;
+    }
+
+    tr, td {
+        border: 1px solid black;
+    }
+
+    td {
+        padding: 1px 5px;
+    }
+
+</style>

@@ -5,17 +5,48 @@
 
 $null_string = 'null_scheduler_placeholder';
 $scheduler_data_table = 'scheduler_data';
+$log_data_table = 'scheduler_log';
+
+function log_action($show, $action) {
+    global $wpdb, $log_data_table;
+    $log_table_name = $wpdb->prefix . $log_data_table;
+    $sql = "INSERT INTO `wp_scheduler_log` (`id`, `user`, `show_name`, `date`, `action`) VALUES (NULL, %s, %s, %s, %s);";
+    $current_user = wp_get_current_user(); //get current user
+    $today = date("Y-m-d"); //set end_date to today as we're archiving it today.
+    $prepared_sql = $wpdb->prepare($sql, $current_user->user_login, $show, $today, $action);
+    echo "<br>LOGGED:" . $prepared_sql . "<br>";
+    // Execute the prepared statement
+    $result = $wpdb->query($prepared_sql);
+    if($result) {
+        echo "Successful log!<br>";
+    } else {
+        echo "Log failed!<br>";
+    }
+}
+
 function scheduler_callback() { //main scheduler page
-    echo "Scheduler page baby! <hr>";
+    if (!empty($_POST)) { //add show
+        if($_POST["archive"]) { //archive show
+            archive_show($_POST["archive"]);
+        }
+    }
+    global $wpdb, $scheduler_data_table, $log_data_table;
+    $data_table_name = $wpdb->prefix . $scheduler_data_table;
+    $results = $wpdb->get_results( "SELECT * FROM ". $data_table_name . " WHERE airing = 1;", OBJECT ); //airing
+    echo "<script>var result_data = " . json_encode($results) . ";</script>"; // for passing from back to front incredibly easily
+    $log_table_name = $wpdb->prefix . $log_data_table;
+    $log_results = $wpdb->get_results( "SELECT * FROM ". $log_table_name . ";", OBJECT ); //airing
+    echo "<script>var log_data = " . json_encode($log_results) . ";</script>"; // for passing from back to front incredibly easily
+    include("scheduler.html");
 }
 
 function add_callback() //add submenu callback
 {
-    if (!empty($_POST)) { //handles post data if there is some
+    if (!empty($_POST)) { //add show
         $data = addedit_post_format_data();
         schedule_add($data);
     }
-    echo "Add page baby! <hr>";
+    echo "<h1>Add show</h1> <hr>";
     include("admin-menu-addedit.html");
 }
 
@@ -33,6 +64,7 @@ function schedule_add($data) //add a show to the database with the data formatte
     $result = $wpdb->query($prepared_sql);
     if($result) {
         echo "<br>Success!";
+        log_action($data['name'], 'add');
     } else {
         echo "<br>Failure!";
     }
@@ -44,10 +76,9 @@ function schedule_add($data) //add a show to the database with the data formatte
 function edit_callback() //edit submenu callback - edit or archive a show
 {
     if (!empty($_POST)) {
-        if($_POST["archive"]) {
+        if($_POST["archive"]) { //archive show
             archive_show($_POST["archive"]);
-            echo "Archiving show!";
-        } else {
+        } else { //edit show
             $data = addedit_post_format_data();
             edit_show($data);
         }
@@ -56,7 +87,7 @@ function edit_callback() //edit submenu callback - edit or archive a show
     $data_table_name = $wpdb->prefix . $scheduler_data_table;
     $results = $wpdb->get_results( "SELECT * FROM " . $data_table_name . " WHERE airing = 1;", OBJECT ); //airing
     echo "<script>var result_data = " . json_encode($results) . ";</script>"; // for passing from back to front incredibly easily
-    echo "Edit page baby! <hr>";
+    echo "<h1>Edit show</h1> <hr>";
     //echo json_encode($results);
     include("admin-menu-addedit.html");
 }
@@ -80,6 +111,7 @@ function edit_show($new_data) //edit a show with the new data formatted by added
     $result = $wpdb->query($prepared_sql);
     if($result) {
         echo "<br>Success!";
+        log_action($new_data['name'], 'edit');
     } else {
         echo "<br>Failure!";
     }
@@ -102,7 +134,7 @@ function addedit_post_format_data() //format post data into a data array for ins
         'name' => $_POST['show-name'],
         'description' => $_POST['show-description'],
         'start_date' => $_POST['start-date'],
-        'end_date' => check_end_date($_POST['end-date'], check_to_bool($_POST['end-date-checkbox'])),
+        'end_date' => check_end_date($_POST['end-date'], check_to_bool($_POST['end-date-checkbox']), $_POST['one-time']),
         'one_time' => check_to_bool($_POST['one-time']),
         'same_time' => check_to_bool($_POST['same-time']),
         'every_x_weeks' => $_POST['every-x-weeks'],
@@ -127,7 +159,6 @@ function archive_callback() //archive submenu callback
     global $wpdb, $scheduler_data_table;
     $data_table_name = $wpdb->prefix . $scheduler_data_table;
     $results = $wpdb->get_results( "SELECT * FROM ". $data_table_name . " WHERE airing = 0;", OBJECT ); //non airing
-    echo "Archive page baby! <hr>";
     echo "<script>var result_data = " . json_encode($results) . ";</script>"; // for passing from back to front incredibly easily
     //echo json_encode($results);
     include("archive.html");
@@ -145,6 +176,7 @@ function unarchive($id) { //unarchive a show with id
     $result = $wpdb->query($prepared_sql);
     if($result) {
         echo "<br>Success!";
+        log_action($_POST['show-name'], 'unarchive');
     } else {
         echo "<br>Failure!";
     }
@@ -164,6 +196,7 @@ function archive_show($id) //archive a show with id
     $result = $wpdb->query($prepared_sql);
     if($result) {
         echo "<br>Success!";
+        log_action($_POST['show-name'], 'archive');
     } else {
         echo "<br>Failure!";
     }
@@ -181,10 +214,12 @@ function check_to_bool($value) { //converts an html checkbox value to a boolean
     return $value == 'on' ? TRUE : FALSE;
 }
 
-function check_end_date($end_date, $notexist) { //checks if the end date exists and returns it or a null placeholder
+function check_end_date($end_date, $notexist, $onetime) { //checks if the end date exists and returns it or a null placeholder
     global $null_string;
     if(!$notexist) { //if does not notexist -> does exist
         return $end_date == '' ? $null_string : $end_date;
+    } else if ($onetime) {
+        return date("Y-m-d"); //today is end if one-time
     } else {
         return $null_string;
     }

@@ -5,14 +5,13 @@
     <div id="form-container">
 
         <form method="post" id="master-form">
+            <div id="edit-show-name" style="display: none;">
+                <label id="choose-label" for="show-name-id">Choose a show:</label>
+                <select id="show-name-id" name="show-name-id"></select>
+            </div>
+
             <fieldset id="show-data">
                 <legend>Show Data</legend>
-
-                <div id="edit-show-name" style="display: none;">
-                    <label for="show-name-id">Choose a show:</label>
-                    <select id="show-name-id" name="show-name-id"></select>
-                </div>
-
                 <div id="input-show-name">
                     <label for="show-name">Show Name</label>
                     <input type="text" id="show-name" name="show-name">
@@ -21,17 +20,19 @@
                 <label for="show-description">Show Description</label>
                 <textarea rows="10" cols="30" id="show-description" name="show-description"></textarea>
 
-                <label for="start-date">Start Date</label>
-                <input type="date" id="start-date" name="start-date">
+                
+                    <label id="start-date-label" for="start-date">Start Date</label>
+                    <input type="date" id="start-date" name="start-date">
 
-                <div id="end-date">
-                    <label for="end-date">End Date</label>
-                    <input type="date" id="end-date" name="end-date">
-                </div>
+                    <div id="end-date">
+                        <label id="end-date-label" for="end-date">End Date</label>
+                        <input type="date" id="end-date" name="end-date">
+                    </div>
+                
 
                 <label for="end-date-checkbox">No End Date Yet</label>
                 <input type="checkbox" id="end-date-checkbox" name="end-date-checkbox">
-                <input type="button" value="Configure Show Page">
+                <!-- <input type="button" value="Configure Show Page"> -->
             </fieldset>
 
             <fieldset id="weekdays">
@@ -42,9 +43,9 @@
                 <br>
                 <hr>
 
-                <label for="every-x-weeks">Every</label>
+                <label for="every-x-weeks" class="weekslabel" id="weekslabel-start">Every</label>
                 <input type="number" id="every-x-weeks" name="every-x-weeks" value=1>
-                <label for="every-x-weeks">week(s).</label>
+                <label for="every-x-weeks" class="weekslabel">week(s).</label>
                 <br>
                 <hr>
 
@@ -74,12 +75,15 @@
                 <label for="sunday">Sunday</label>
                 <input type="checkbox" class="day-check" id="sunday" name="sunday">
             </fieldset>
-
+        
+        <div id="buttons">
             <input type="submit" value="Add Show" id="master-form-submit">
         </form>
         <form id="archiveform" method="post" style="display: none;">
             <button id="archivebutton" name="archive" value="">Archive</button>
+            <input type='hidden' id="archivebutton-name" name='show-name' value=''>
         </form>
+        </div>
     </div>
 </body>
 
@@ -128,6 +132,8 @@
         }
     }
 
+    start_day = undefined;
+
     function sameTimeFUNC(checkbox) { //same time checkbox
         sts = [document.getElementById('same-time-start-time'), document.getElementById('same-time-end-time')];
         if (checkbox.checked) {
@@ -141,7 +147,7 @@
             document.getElementById('same-time').checked = false;
             document.querySelectorAll('input[type="time"]').forEach(element => {
                 element.disabled = false;
-                console.log(start_day);
+                //console.log(start_day);
                 if (!(start_day === undefined)) {
                     days[start_day].checked = true;
                     days[start_day].disabled = true;
@@ -153,6 +159,7 @@
 
 
     function startDayFUNC(startDate, startDayQueue) { //start date to day conversion
+        console.log("hello?");
         if (document.getElementById('end-date').value < startDate.value) {
             document.getElementById('end-date').value = startDate.value;
         }
@@ -203,6 +210,7 @@
         });
         resetForm();
         document.getElementById('archivebutton').value = edit_data['id'];
+        document.getElementById('archivebutton-name').value = edit_data['name'];
         document.getElementById('show-name').value = edit_data['name'];
         document.getElementById('show-description').value = edit_data['description'];
         document.getElementById('start-date').value = edit_data['start_date'];
@@ -255,6 +263,7 @@
             //</div>
             timeInputDiv = document.createElement('div');
             timeInputDiv.style.display = 'none';
+            timeInputDiv.className = 'time-input-div';
 
             startTimeLabel = document.createElement('label');
             startTimeLabel.innerText = 'Start Time';
@@ -269,11 +278,12 @@
             endTime = document.createElement('input');
             endTime.type = 'time';
             endTime.name = endTime.id = element.id + '-end-time';
-
+            
             timeInputDiv.appendChild(startTimeLabel);
             timeInputDiv.appendChild(startTime);
             timeInputDiv.appendChild(endTimeLabel);
             timeInputDiv.appendChild(endTime);
+            //timeInputDiv.appendChild(document.createElement('hr'));
 
 
             element.insertAdjacentElement('afterend', timeInputDiv);
@@ -345,6 +355,40 @@
 
 <!--TODO: STYLE-->
 <style>
+    hr {
+        clear: both;
+    }
+
+    label.weekslabel {
+        clear: none;
+        margin: 0.4rem 0.1rem;
+    }
+
+    label, label#weekslabel-start.weekslabel {
+        margin-left: 0.3rem;
+    }
+
+    input#every-x-weeks {
+        width: 5rem;
+        margin-bottom: 0.3rem;
+    }
+
+    input[type="checkbox"] {
+        margin: auto;
+        margin-left: 0.5rem;
+    }
+
+    button#archivebutton {
+        float:left;
+        font-size: 14px;
+    }
+
+    textarea#show-description, input#show-name {
+        width: 95%;
+        clear: both;
+        margin: 5px;
+    }
+
     label, input {
         float: left;
     }
@@ -357,6 +401,37 @@
         width: fit-content;
         float: left;
         border: solid 1px;
-        margin: 0.25em;
+        margin: 0.25rem;
+        height: 375px;
+        overflow-y: auto;
+    }
+
+    .time-input-div {
+        width: 100%;
+    }
+
+    .time-input-div>label {
+        display: block;
+        float: none;
+        text-align: center;
+    }
+
+    .time-input-div>input[type="time"] {
+        position: relative;
+        left: 15%;
+    }
+
+    input[type="time"] {
+        margin-bottom: 0.3rem;
+    }
+
+    label#start-date-label, label#end-date-label, label#choose-label  {
+        clear:none;
+        padding-top: 0.3rem;
+        padding-right: 0.2rem;
+    }
+
+    input#start-date, input#end-date {
+        margin-bottom: 0.4rem;
     }
 </style>

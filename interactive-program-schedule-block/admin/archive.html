@@ -3,11 +3,11 @@
 
 <body>
     <h1>Archive</h1>
-
+    <hr>
     <table id="archivetable">
         <tr>
             <th>Id</th>
-            <th>Name</th>
+            <th>Show Name</th>
             <th>Description</th>
             <th>Start Date</th>
             <th>End Date</th>
@@ -69,7 +69,7 @@
         newCell.innerHTML = 'TODO';
 
         newCell = newRow.insertCell(9);
-        newCell.innerHTML = "<form method='post' class='una-form'> <button name='id' value='" + element["id"]  + "' upvote''>Unarchive</button> </form>";
+        newCell.innerHTML = "<form method='post' class='una-form'> <button name='id' value='" + element["id"]  + "'>Unarchive</button> <input type='hidden' name='show-name' value='"+ element["name"] +"'> </form>";
     }
     
 
@@ -96,7 +96,7 @@
         border-collapse: collapse;
     }
 
-    tr td {
+    tr, td {
         border: 1px solid black;
     }
 
