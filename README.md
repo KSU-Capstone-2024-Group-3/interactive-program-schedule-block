@@ -6,8 +6,8 @@ Developed on a local wordpress docker container. The docker build file is includ
 
 KSU Capstone Group 3 Spring 2024.
 
-<pre>
 User Manual (UM)
+<pre>
 •	How to start the development enironment
 1.  Move the "docker-compose.yaml" to a directory you are okay with a WordPress installation being made in.
 2.  Download and install the Docker Engine. 
