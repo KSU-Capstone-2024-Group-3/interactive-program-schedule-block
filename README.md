@@ -17,7 +17,7 @@ WordPress will be hosted on localhost:8000 with username: "root" and password: "
 phpMyAdmin will be hosted on localhost:8080  with username: "root" and password: "password" 
   
 •	How to install the plugin
-1.	Go to your WordPress plugin menu.
+1.  Go to your WordPress plugin menu.
 2.	Click the “Add New Plugin” button. 
 3.	Click the “Upload Plugin” button.
 4.	Click the “Choose File" button. 
