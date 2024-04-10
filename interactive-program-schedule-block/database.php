@@ -17,7 +17,7 @@ function init_schedule_database() { //create the scheduler_data table
         ) " . $charset_collate . ";";
     
     $log_table_name = $wpdb->prefix . 'scheduler_log';
-    $sql = "CREATE TABLE ". $log_table_name . " ( 
+    $sql .= "CREATE TABLE ". $log_table_name . " ( 
         id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         user VARCHAR(255) NOT NULL,
         show_name VARCHAR(255) NOT NULL,
