@@ -3,7 +3,6 @@
 
 <body>
     <div id="form-container">
-
         <form method="post" id="master-form">
             <div id="edit-show-name" style="display: none;">
                 <label id="choose-label" for="show-name-id">Choose a show:</label>
@@ -75,7 +74,7 @@
                 <label for="sunday">Sunday</label>
                 <input type="checkbox" class="day-check" id="sunday" name="sunday">
             </fieldset>
-        
+        <input type="hidden" name="tz-offset" id="tz-offset" value="">
         <div id="buttons">
             <input type="submit" value="Add Show" id="master-form-submit">
         </form>
@@ -147,10 +146,8 @@
             document.getElementById('same-time').checked = false;
             document.querySelectorAll('input[type="time"]').forEach(element => {
                 element.disabled = false;
-                //console.log(start_day);
                 if (!(start_day === undefined)) {
                     days[start_day].checked = true;
-                    days[start_day].disabled = true;
                     days[start_day].nextElementSibling.style.display = 'block';
                 }
             });
@@ -168,13 +165,11 @@
         start_day = startDay.getDay() + 1; //0 is the 'Same time.' checkbox
         if (startDayQueue.length > 0) { //use a queue to keep track of the last day checked
             days[startDayQueue[0]].checked = false;
-            days[startDayQueue[0]].disabled = false;
             days[startDayQueue[0]].nextElementSibling.style.display = 'none';
             startDayQueue.pop();
         }
-        //check the day and disable it
+        //check the day
         days[start_day].checked = true;
-        days[start_day].disabled = true;
         days[start_day].nextElementSibling.style.display = 'block';
         startDayQueue.push(start_day);
     }
@@ -185,11 +180,18 @@
             document.getElementById('every-x-weeks').disabled = true;
             document.querySelectorAll('.day-check').forEach(element => {
                 element.disabled = true;
+                element.checked = false;
+                element.nextElementSibling.style.display = 'none';
             });
             document.getElementById('same-time').disabled = true;
             endDate = document.getElementById("end-date")
             endDate.disabled = true;
             endDate.value = startDate.value;
+            if (!(start_day === undefined)) {
+                    days[start_day].checked = true;
+                    days[start_day].disabled = false;
+                    days[start_day].nextElementSibling.style.display = 'block';
+                }
         } else {
             document.getElementById('one-time').checked = false;
             document.getElementById('every-x-weeks').disabled = false;
@@ -223,9 +225,6 @@
         if (edit_data['one_time']) {
             oneTimeFUNC(boolToCheck(edit_data['one_time']));
         };
-        if (edit_data['same_time']) {
-            sameTimeFUNC(boolToCheck(edit_data['same_time']));
-        };
         if (edit_data['end_date'] == null) {
             noEndDateFUNC(boolToCheck(true));
         };
@@ -233,14 +232,25 @@
 
         weekArr = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
         json_schedule = JSON.parse(edit_data["schedule"]);
+        let flagStart, flagEnd;
         for (let i = 0; i < weekArr.length; i++) {
             if (json_schedule[weekArr[i]][0]) {
                 days[i + 1].checked = true;
                 checkboxFUNC(days[i + 1]);
                 document.getElementById(days[i + 1].id + '-start-time').value = json_schedule[weekArr[i]][1];
+                flagStart = json_schedule[weekArr[i]][1];
                 document.getElementById(days[i + 1].id + '-end-time').value = json_schedule[weekArr[i]][2];
+                flagEnd = json_schedule[weekArr[i]][2];
             }
         }
+
+        if (edit_data['same_time']) {
+            sameTimeFUNC(boolToCheck(edit_data['same_time']));
+            checkboxFUNC(days[0]);
+            document.getElementById('same-time-start-time').value = flagStart;
+            document.getElementById('same-time-end-time').value = flagEnd;
+    
+        };
     }
 
     function boolToCheck(bool) { //convert bool to checkbox
@@ -251,6 +261,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {//add all our event listeners, add start / end time inputs, add result_data handling
+        document.getElementById("tz-offset").value = new Date().getTimezoneOffset();
         days = document.querySelectorAll('.day-check');
         let start_day;
         days.forEach(element => {
@@ -346,9 +357,6 @@
                 loadIntoForm(result_data, this);
             });
             loadIntoForm(result_data, selectList);
-        } else {
-            document.getElementById('input-show-name').style.display = 'block'
-            document.getElementById('edit-show-name').style.display = 'none'
         }
     });
 </script>
