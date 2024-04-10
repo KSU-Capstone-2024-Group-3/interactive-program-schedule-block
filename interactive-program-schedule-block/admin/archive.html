@@ -24,6 +24,20 @@
 </html>
 
 <script>
+    function miniSchedule(schedule) {
+        miniS = document.createElement('span');
+        schedule = JSON.parse(schedule);
+        const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        console.log(schedule);
+        days.forEach((day) => { //for each day
+            if (schedule[day][0]) { //if the day is in the schedule
+                miniS.innerHTML += "<span class='running'>" + day.charAt(0).toUpperCase() + "</span>";
+            } else {
+                miniS.innerHTML += day.charAt(0).toUpperCase();
+            }
+		});
+        return miniS;
+    }
     
     function loadElementToTable(element) {
         // Get the table
@@ -66,7 +80,7 @@
 
         // Insert a cell in the row at index 9
         newCell = newRow.insertCell(8);
-        newCell.innerHTML = 'TODO';
+        newCell.innerHTML = miniSchedule(element["schedule"]).innerHTML;
 
         newCell = newRow.insertCell(9);
         newCell.innerHTML = "<form method='post' class='una-form'> <button name='id' value='" + element["id"]  + "'>Unarchive</button> <input type='hidden' name='show-name' value='"+ element["name"] +"'> </form>";
@@ -89,6 +103,10 @@
     .una-form>button {
         display: block;
         margin: auto;
+    }
+
+    .running {
+        color: violet;
     }
 
     #archivetable {

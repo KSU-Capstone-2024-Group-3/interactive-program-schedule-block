@@ -34,8 +34,9 @@ function init_schedule_database() { //create the scheduler_data table
 function drop_schedule_database() {
     global $wpdb;
     $data_table_name = $wpdb->prefix . 'scheduler_data';
-    $sql = "DROP TABLE IF EXISTS " . $data_table_name . ";";
+    $sql = "DROP TABLE IF EXISTS $data_table_name;";
+    $wpdb->query($sql);
     $log_table_name = $wpdb->prefix . 'scheduler_log';
-    $sql .= "DROP TABLE IF EXISTS " . $log_table_name . ";";
+    $sql = "DROP TABLE IF EXISTS $log_table_name;";
     $wpdb->query($sql);
 }

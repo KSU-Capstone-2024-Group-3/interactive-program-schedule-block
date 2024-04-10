@@ -186,7 +186,7 @@ echo "<script>var result_data = " . json_encode($results) . ";</script>"; // for
 		margin-bottom: 5px;
 		height: 5rem;
 		width: min-content;
-		min-width: 6rem;
+		min-width: 6.5rem;
 		overflow: hidden;
 		position: relative;
 	}
