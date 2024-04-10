@@ -6,6 +6,7 @@ Developed on a local wordpress docker container. The docker build file is includ
 
 KSU Capstone Group 3 Spring 2024.
 
+<pre>
 User Manual (UM)
 •	How to start the development enironment
 1. 
@@ -26,3 +27,5 @@ User Manual (UM)
 •	How to add the calendar block to a page
 •	Schedule tables.
 •	Admin logs.
+
+</pre>
