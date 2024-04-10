@@ -26,7 +26,7 @@ phpMyAdmin will be hosted on localhost:8080  with username: "root" and password:
 7.  Activate the plugin!
 
 •	How to add a show.
-1.   Navigate to the "Add Show" sub menu in the Schulder admin menu.
+1.   Navigate to the "Add Show" sub menu in the "Scheduler" admin menu.
 2.   Fill out the form.
 3.   Click "Add Show"
   
