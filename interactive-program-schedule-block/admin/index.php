@@ -1,8 +1,5 @@
 <?php // Silence is golden
 
-//TODO: bitfield with time for those specific bits - foreign key it
-//TODO: metadata for show - stuff added afterwards
-
 $null_string = 'null_scheduler_placeholder';
 $scheduler_data_table = 'scheduler_data';
 $log_data_table = 'scheduler_log';
@@ -121,20 +118,20 @@ function addedit_post_format_data() //format post data into a data array for ins
 {
     // handle post data
     $days = array(
-        'monday'    =>  day_tuple($_POST['monday-start-time'], $_POST['monday-end-time']),
-        'tuesday'   =>  day_tuple($_POST['tuesday-start-time'], $_POST['tuesday-end-time']),
-        'wednesday' =>  day_tuple($_POST['wednesday-start-time'], $_POST['wednesday-end-time']),
-        'thursday'  =>  day_tuple($_POST['thursday-start-time'], $_POST['thursday-end-time']),
-        'friday'    =>  day_tuple($_POST['friday-start-time'], $_POST['friday-end-time']),
-        'saturday'  =>  day_tuple($_POST['saturday-start-time'], $_POST['saturday-end-time']),
-        'sunday'    =>  day_tuple($_POST['sunday-start-time'], $_POST['sunday-end-time'])
+        'monday'    =>  day_tuple($_POST['monday'], $_POST['monday-start-time'], $_POST['monday-end-time']),
+        'tuesday'   =>  day_tuple($_POST['tuesday'], $_POST['tuesday-start-time'], $_POST['tuesday-end-time']),
+        'wednesday' =>  day_tuple($_POST['wednesday'], $_POST['wednesday-start-time'], $_POST['wednesday-end-time']),
+        'thursday'  =>  day_tuple($_POST['thursday'], $_POST['thursday-start-time'], $_POST['thursday-end-time']),
+        'friday'    =>  day_tuple($_POST['friday'], $_POST['friday-start-time'], $_POST['friday-end-time']),
+        'saturday'  =>  day_tuple($_POST['saturday'], $_POST['saturday-start-time'], $_POST['saturday-end-time']),
+        'sunday'    =>  day_tuple($_POST['sunday'], $_POST['sunday-start-time'], $_POST['sunday-end-time'])
     );
 
     $data = array(
         'name' => $_POST['show-name'],
         'description' => $_POST['show-description'],
         'start_date' => $_POST['start-date'],
-        'end_date' => check_end_date($_POST['end-date'], check_to_bool($_POST['end-date-checkbox']), $_POST['one-time']),
+        'end_date' => check_end_date($_POST['end-date'], $_POST['start-date'], check_to_bool($_POST['end-date-checkbox']), $_POST['one-time']),
         'one_time' => check_to_bool($_POST['one-time']),
         'same_time' => check_to_bool($_POST['same-time']),
         'every_x_weeks' => $_POST['every-x-weeks'],
@@ -202,24 +199,29 @@ function archive_show($id) //archive a show with id
     }
 }
 
-function day_tuple($start_time, $end_time) { //return a tuple of boolean on that day, start, and end time for a day
-    if ($start_time != '' && $end_time != '') {
-        return [TRUE, $start_time, $end_time];
-    } else {
-        return [FALSE, null, null];
+function day_tuple($check, $start_time, $end_time) { //return a tuple of boolean on that day, start, and end time for a day
+    //TODO Localize time zones
+    if(check_to_bool($check)) {
+        if(check_to_bool($_POST['same-time'])) {
+            return [TRUE, $_POST['same-time-start-time'], $_POST['same-time-end-time']];
+        }
+        if ($start_time != '' && $end_time != '') {
+            return [TRUE, $start_time, $end_time];
+        }
     }
+    return [FALSE, null, null];
 }
 
 function check_to_bool($value) { //converts an html checkbox value to a boolean
     return $value == 'on' ? TRUE : FALSE;
 }
 
-function check_end_date($end_date, $notexist, $onetime) { //checks if the end date exists and returns it or a null placeholder
+function check_end_date($end_date, $start_date, $notexist, $onetime) { //checks if the end date exists and returns it or a null placeholder
     global $null_string;
     if(!$notexist) { //if does not notexist -> does exist
         return $end_date == '' ? $null_string : $end_date;
     } else if ($onetime) {
-        return date("Y-m-d"); //today is end if one-time
+        return $start_date; //today is end if one-time
     } else {
         return $null_string;
     }
