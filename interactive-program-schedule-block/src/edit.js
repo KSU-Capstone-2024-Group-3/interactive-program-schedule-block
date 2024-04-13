@@ -24,7 +24,7 @@ import { useBlockProps } from '@wordpress/block-editor';
 export default function Edit() {
 	return (
 		<p { ...useBlockProps() }>
-			<div> Interactive Scheduler Calendar </div>
+			<div class="edit"> Interactive Scheduler Calendar </div>
 		</p>
 	);
 }
