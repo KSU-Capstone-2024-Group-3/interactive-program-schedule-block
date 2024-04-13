@@ -1,7 +1,7 @@
 {
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
-  "name": "create-block/interactive-program-schedule-block",
+  "name": "ksu-capstone/interactive-program-schedule-block",
   "version": "1.0.0",
   "title": "Interactive Program Schedule Block",
   "category": "widgets",
@@ -9,6 +9,9 @@
   "description": "Interactive scheduler calendar block.",
   "example": {},
   "supports": {
+    "align": [
+      "full"
+    ],
     "html": false
   },
   "textdomain": "interactive-program-schedule-block",
