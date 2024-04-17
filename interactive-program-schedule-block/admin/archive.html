@@ -16,6 +16,7 @@
             <th>Every-x-Weeks</th>
             <th>Schedule</th>
             <th>Continue Airing</th>
+            <th>Delete</th>
         </tr>
     </table>
 
@@ -83,7 +84,10 @@
         newCell.innerHTML = miniSchedule(element["schedule"]).innerHTML;
 
         newCell = newRow.insertCell(9);
-        newCell.innerHTML = "<form method='post' class='una-form'> <button name='id' value='" + element["id"]  + "'>Unarchive</button> <input type='hidden' name='show-name' value='"+ element["name"] +"'> </form>";
+        newCell.innerHTML = "<form method='post' class='una-form'> <button name='unarchive' value='" + element["id"]  + "'>Unarchive</button> <input type='hidden' name='show-name' value='"+ element["name"] +"'> </form>";
+    
+        newCell = newRow.insertCell(10);
+        newCell.innerHTML = "<form method='post' class='una-form'> <button name='delete' value='" + element["id"]  + "'>Delete</button> <input type='hidden' name='show-name' value='"+ element["name"] +"'> </form>";
     }
     
 

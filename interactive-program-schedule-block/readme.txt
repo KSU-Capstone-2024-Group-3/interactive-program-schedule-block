@@ -17,7 +17,7 @@ Simple weekly calendar that displays show data sorted by day and time.
 1. Upload the plugin files to the `/wp-content/plugins/interactive-program-schedule-block` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress
 3. Add Shows
-4. Add "Interactive Program Schedule Block" block to desired page.
+4. Add "Interactive Program Schedule Block" block to desired page. (make it wide if desired)
 
 == Changelog ==
 
