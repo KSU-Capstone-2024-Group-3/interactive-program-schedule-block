@@ -4,20 +4,20 @@ $null_string = 'null_scheduler_placeholder';
 $scheduler_data_table = 'scheduler_data';
 $log_data_table = 'scheduler_log';
 
-function log_action($show, $action) {
+function log_action($show, $action) { //log an action with a show and an action (string)
     global $wpdb, $log_data_table;
     $log_table_name = $wpdb->prefix . $log_data_table;
-    $sql = "INSERT INTO `wp_scheduler_log` (`id`, `user`, `show_name`, `date`, `action`) VALUES (NULL, %s, %s, %s, %s);";
+    $sql = "INSERT INTO `$log_table_name` (`id`, `user`, `show_name`, `date`, `action`) VALUES (NULL, %s, %s, %s, %s);";
     $current_user = wp_get_current_user(); //get current user
     $today = date("Y-m-d"); //set end_date to today as we're archiving it today.
     $prepared_sql = $wpdb->prepare($sql, $current_user->user_login, $show, $today, $action);
-    echo "<br>LOGGED:" . $prepared_sql . "<br>";
+    //echo "<br>LOGGED:" . $prepared_sql . "<br>";
     // Execute the prepared statement
     $result = $wpdb->query($prepared_sql);
     if($result) {
-        echo "Successful log!<br>";
+        echo "<br>Successful log!";
     } else {
-        echo "Log failed!<br>";
+        echo "<br>Log failed!";
     }
 }
 
@@ -31,6 +31,7 @@ function scheduler_callback() { //main scheduler page
     $data_table_name = $wpdb->prefix . $scheduler_data_table;
     $results = $wpdb->get_results( "SELECT * FROM ". $data_table_name . " WHERE airing = 1;", OBJECT ); //airing
     echo "<script>var result_data = " . json_encode($results) . ";</script>"; // for passing from back to front incredibly easily
+    keepLastMonthLogs();
     $log_table_name = $wpdb->prefix . $log_data_table;
     $log_results = $wpdb->get_results( "SELECT * FROM ". $log_table_name . ";", OBJECT ); //airing
     echo "<script>var log_data = " . json_encode($log_results) . ";</script>"; // for passing from back to front incredibly easily
@@ -56,7 +57,7 @@ function schedule_add($data) //add a show to the database with the data formatte
     // Use $wpdb->prepare to prevent SQL injection
     $prepared_sql = $wpdb->prepare($sql, $data);
     $prepared_sql = str_replace("'" . $null_string . "'",'NULL', $prepared_sql); //get rid of placeholder nulls
-    echo "<br>" . $prepared_sql;
+    //echo "<br>" . $prepared_sql;
     // Execute the prepared statement
     $result = $wpdb->query($prepared_sql);
     if($result) {
@@ -103,7 +104,7 @@ function edit_show($new_data) //edit a show with the new data formatted by added
     $prepared_sql = $wpdb->prepare($sql, $new_data);
     $prepared_sql = str_replace("'" . $null_string . "'",'NULL', $prepared_sql); //get rid of placeholder nulls
     
-    echo "<br>" . $prepared_sql;
+    //echo "<br>" . $prepared_sql;
     // Execute the prepared statement
     $result = $wpdb->query($prepared_sql);
     if($result) {
@@ -148,10 +149,23 @@ function addedit_post_format_data() //format post data into a data array for ins
 
 }
 
+function keepLastMonthLogs() {
+    global $wpdb, $log_data_table;
+    $log_table_name = $wpdb->prefix . $log_data_table;
+    $sql = "DELETE FROM " . $log_table_name . " WHERE date < DATE_SUB(NOW(), INTERVAL 1 MONTH);";
+    $result = $wpdb->query($sql);
+    echo "<br>Deleted " . $result . " admin logs from over a month ago.";
+}
+
 function archive_callback() //archive submenu callback
 {
     if (!empty($_POST)) {
-        unarchive($_POST['id']);
+        if($_POST["unarchive"]) { //archive show
+            unarchive($_POST["unarchive"]);
+        }
+        if($_POST["delete"]) { //archive show
+            delete_show($_POST["delete"]);
+        }
     }
     global $wpdb, $scheduler_data_table;
     $data_table_name = $wpdb->prefix . $scheduler_data_table;
@@ -168,12 +182,29 @@ function unarchive($id) { //unarchive a show with id
     $sql = "UPDATE " . $data_table_name . " SET `end_date` = NULL, `airing` = '1'  WHERE `" . $data_table_name . "`.`id` = %d;";
     $prepared_sql = $wpdb->prepare($sql, $id);
 
-    echo $prepared_sql;
+    //echo $prepared_sql;
     // Execute the prepared statement
     $result = $wpdb->query($prepared_sql);
     if($result) {
         echo "<br>Success!";
         log_action($_POST['show-name'], 'unarchive');
+    } else {
+        echo "<br>Failure!";
+    }
+}
+
+function delete_show($id) { //delete a show with id
+    global $wpdb, $scheduler_data_table;
+    $data_table_name = $wpdb->prefix . $scheduler_data_table;
+    $sql = "DELETE FROM " . $data_table_name . " WHERE `" . $data_table_name . "`.`id` = %d;";
+    $prepared_sql = $wpdb->prepare($sql, $id);
+
+    //echo $prepared_sql;
+    // Execute the prepared statement
+    $result = $wpdb->query($prepared_sql);
+    if($result) {
+        echo "<br>Success!";
+        log_action($_POST['show-name'], 'delete');
     } else {
         echo "<br>Failure!";
     }
@@ -188,7 +219,7 @@ function archive_show($id) //archive a show with id
     $sql = "UPDATE " . $data_table_name . " SET `end_date` = '" . $today . "', `airing` = '0'  WHERE `" . $data_table_name . "`.`id` = %d;";
     $prepared_sql = $wpdb->prepare($sql, $id);
 
-    echo $prepared_sql;
+    //echo $prepared_sql;
     // Execute the prepared statement
     $result = $wpdb->query($prepared_sql);
     if($result) {
@@ -200,16 +231,19 @@ function archive_show($id) //archive a show with id
 }
 
 function day_tuple($check, $start_time, $end_time) { //return a tuple of boolean on that day, start, and end time for a day
-    //TODO Localize time zones
     if(check_to_bool($check)) {
         if(check_to_bool($_POST['same-time'])) {
             return [TRUE, $_POST['same-time-start-time'], $_POST['same-time-end-time']];
         }
-        if ($start_time != '' && $end_time != '') {
+        if ($start_time != '' && $end_time != '') { //if both start and end time exist
             return [TRUE, $start_time, $end_time];
+        } else if ($start_time != '') { //if only start time exists
+            return [TRUE, $start_time, $start_time];
+        } else if ($end_time != '') { //if only end time exists
+            return [TRUE, $end_time, $end_time];
         }
     }
-    return [FALSE, null, null];
+    return [FALSE, null, null]; //if all else fails, return false null null
 }
 
 function check_to_bool($value) { //converts an html checkbox value to a boolean
@@ -218,12 +252,13 @@ function check_to_bool($value) { //converts an html checkbox value to a boolean
 
 function check_end_date($end_date, $start_date, $notexist, $onetime) { //checks if the end date exists and returns it or a null placeholder
     global $null_string;
-    if(!$notexist) { //if does not notexist -> does exist
-        return $end_date == '' ? $null_string : $end_date;
-    } else if ($onetime) {
+    if ($onetime) {
         return $start_date; //today is end if one-time
-    } else {
+    }
+    if($notexist) { //if does notexist return nullstring, else return end_date or nullstring
         return $null_string;
+    } else {
+        return $end_date == '' ? $null_string : $end_date;
     }
 }
 

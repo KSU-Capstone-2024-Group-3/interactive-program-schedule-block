@@ -20,12 +20,16 @@
         </tr>
     </table>
     </div>
+    <div class = "key">
+    Key:
+    <div class="running">*On this day.</div>
+    <div style="color:red">*End date passed.</div>
+    </div>
     <h1>Admin logs</h1>
     <hr>
     <div class="table-container">
         <table id="logtable">
             <tr>
-                <th>Id</th>
                 <th>User</th>
                 <th>Show Name</th>
                 <th>Date</th>
@@ -115,22 +119,18 @@
 
         // Insert a cell in the row at index 0
         newCell = newRow.insertCell(0);
-        newCell.innerHTML = element["id"];
+        newCell.innerHTML = element["user"];
 
         // Insert a cell in the row at index 1
         newCell = newRow.insertCell(1);
-        newCell.innerHTML = element["user"];
+        newCell.innerHTML = element["show_name"];
 
         // Insert a cell in the row at index 2
         newCell = newRow.insertCell(2);
-        newCell.innerHTML = element["show_name"];
-
-        // Insert a cell in the row at index 3
-        newCell = newRow.insertCell(3);
         newCell.innerHTML = element["date"];
 
         // Insert a cell in the row at index 3
-        newCell = newRow.insertCell(4);
+        newCell = newRow.insertCell(3);
         newCell.innerHTML = element["action"];
     }
 
@@ -164,13 +164,15 @@
     }
 
     #airingtable, #logtable {
-        width: 90%;
+        width: 100%;
         border-collapse: collapse;
     }
 
     .table-container {
         max-height: 20rem;
         overflow-y: auto;
+        width: 95%;
+        border: 1px solid black;
     }
 
     tr, td {
